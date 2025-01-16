@@ -1,0 +1,17 @@
+---
+
+services:
+  sthenosfit-nginx:
+    networks:
+      - public
+
+  frontend:
+    image: "registry.gitlab.com/visualleaflet/sthenosfit-ng/sthenosfit-frontend:${sthenosfit_FRONTEND_VERSION:-latest}"
+
+  api:
+    image: "registry.gitlab.com/visualleaflet/sthenosfit-ng/sthenosfit-api/api:${sthenosfit_API_VERSION:-latest}"
+
+networks:
+  public:
+    name: nginx-proxy
+    external: true

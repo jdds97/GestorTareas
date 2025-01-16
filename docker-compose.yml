@@ -1,0 +1,75 @@
+services:
+  db:
+    container_name: "${COMPOSE_PROJECT_NAME:-taskmanager}_postgres"
+    image: postgres:15
+    restart: "${DOCKER_RESTART_POLICY:-always}"
+    environment:
+      POSTGRES_DB: "${DB_NAME:-task_management}"
+      POSTGRES_USER: "${DB_USER:-postgres}"
+      POSTGRES_PASSWORD: "${DB_PASSWORD:-postgres}"
+    expose:
+      - "5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/initdb.d:/docker-entrypoint-initdb.d
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    container_name: "${COMPOSE_PROJECT_NAME:-taskmanager}_backend"
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+      target: test-runner
+    restart: "${DOCKER_RESTART_POLICY:-always}"
+    volumes:
+      - ./backend:/app
+      - backend_static:/srv/django/static
+      - backend_media:/srv/django/media
+    env_file: ./backend/.env
+    expose:
+      - "8000"
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - app-network
+
+    command: /app/docker/dummy-server.sh
+  # frontend:
+  #   container_name: "${COMPOSE_PROJECT_NAME:-taskmanager}_frontend"
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: Dockerfile
+  #   restart: "${DOCKER_RESTART_POLICY:-always}"
+  #   environment:
+  #     NEXT_PUBLIC_API_URL: "${NEXT_PUBLIC_API_URL:-http://localhost:8000}"
+  #     NODE_ENV: "${NODE_ENV:-development}"
+  #   volumes:
+  #     - ./frontend:/app
+  #     - /app/node_modules
+  #     - /app/.next
+  #   expose:
+  #     - "3000"
+  #   ports:
+  #     - "3000:3000"
+  #   depends_on:
+  #     - backend
+  #   networks:
+  #     - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  backend_static:
+  backend_media:
