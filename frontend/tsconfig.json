@@ -1,0 +1,52 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "allowUnreachableCode": false,
+    "declaration": true,
+    "esModuleInterop": true,
+    "incremental": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "paths": {
+      "@/*": [ "./app/*" ],
+      "@/components/*": [ "./components/*" ],
+      "@/lib/*": [ "./server/*" ],
+      "@/types/*": [ "./types/*" ],
+      "@/styles/*": [ "./styles/*" ],
+      "@/public/*": [ "./public/*" ],
+      "auth": [ "./auth" ]
+    },
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "pretty": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "target": "ES2021"
+  },
+  "exclude": [
+    "node_modules"
+  ],
+  "include": [
+    "tailwind.config.js",
+    "postcss.config.cjs",
+    "eslintrc.json",
+    "next.config.js",
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "__tests__/page.test.js"
+  ]
+}
