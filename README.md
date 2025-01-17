@@ -35,7 +35,7 @@ docker compose exec backend bash
 ```bash
 make migrations
 make migrate
-make createsuperuser
+make superuser
 ```
 3. Iniciar servidor de desarrollo
 ```bash

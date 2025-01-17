@@ -139,4 +139,4 @@ certs/
 /node_modules
 # bbdd
 db.sqlite3
-migrations/
+
