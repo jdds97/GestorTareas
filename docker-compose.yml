@@ -1,4 +1,21 @@
 services:
+  nginx:
+    container_name: "${COMPOSE_PROJECT_NAME:-taskmanager}_nginx"
+    restart: "${DOCKER_RESTART_POLICY:-always}"
+    build:
+      context: docker/nginx
+    expose:
+      - "80"
+    ports:
+      - "8080:80"
+    volumes:
+      - backend_static:/srv/api/
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - app-network
+
   db:
     container_name: "${COMPOSE_PROJECT_NAME:-taskmanager}_postgres"
     image: postgres:15
@@ -43,27 +60,36 @@ services:
       - app-network
 
     command: /app/docker/dummy-server.sh
-  # frontend:
-  #   container_name: "${COMPOSE_PROJECT_NAME:-taskmanager}_frontend"
-  #   build:
-  #     context: ./frontend
-  #     dockerfile: Dockerfile
-  #   restart: "${DOCKER_RESTART_POLICY:-always}"
-  #   environment:
-  #     NEXT_PUBLIC_API_URL: "${NEXT_PUBLIC_API_URL:-http://localhost:8000}"
-  #     NODE_ENV: "${NODE_ENV:-development}"
-  #   volumes:
-  #     - ./frontend:/app
-  #     - /app/node_modules
-  #     - /app/.next
-  #   expose:
-  #     - "3000"
-  #   ports:
-  #     - "3000:3000"
-  #   depends_on:
-  #     - backend
-  #   networks:
-  #     - app-network
+
+  frontend:
+    container_name: "${COMPOSE_PROJECT_NAME:-taskmanager}_frontend"
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: test-runner
+    restart: "${DOCKER_RESTART_POLICY:-always}"
+    volumes:
+      - ./frontend:/app
+    # Esta configuración es para desarrollo local
+    env_file: ./frontend/.env
+    # Iniciamos como usuario root y añadimos la capacidad CAP_SYS_ADMIN
+    # Esto es necesario para poder montar el directorio node_modules dentro del contenedor
+    # sobre los archivos montados desde el host
+    user: root
+    cap_add: [SYS_ADMIN]
+    security_opt:
+      # Se requiere desactivar apparmor para permitir montajes dentro del contenedor
+      # Esto es necesario para el correcto funcionamiento de node_modules
+      - "apparmor=unconfined"
+    expose:
+      - "3000"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - app-network
+    command: /app/docker/dummy-server.sh
 
 networks:
   app-network:

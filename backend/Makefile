@@ -32,15 +32,14 @@ runserver:
 .PHONY: uwsgi
 uwsgi: static wait-for-db
 	@uwsgi --socket 0.0.0.0:8000 \
-		--plugins python3 \
 		--processes=4 \
 		--buffer-size=32768 \
 		--wsgi-file config/wsgi.py
 
 .PHONY: wait-for-db
 wait-for-db:
-	@while ! nc -z "db" "5432"; do \
-		echo "Waiting for database..."; \
+	@while ! pg_isready -h "db" -p "5432" -U "postgres"; do \
+		echo "Esperando a la base de datos..."; \
 		sleep 1; \
 	done
 
