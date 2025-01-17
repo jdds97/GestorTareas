@@ -31,9 +31,10 @@ RUN pipenv install --system --site-packages --deploy --dev
 # Crear directorios necesarios y ajustar permisos
 RUN <<EOF
 set -eux
-mkdir -p /app/media
-mkdir -p /app/static
-chown -R taskuser:taskuser /app
+mkdir -p /app && chown -R taskuser:taskuser /app
+mkdir -p /srv/django/media
+mkdir -p /srv/django/static
+chown -R taskuser:taskuser /srv/django
 EOF
 
 ENV PATH="$PATH:/home/taskuser/.local/bin"
