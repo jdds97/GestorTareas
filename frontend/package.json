@@ -1,5 +1,6 @@
 {
   "name": "frontend",
+  "description": "Frontend application for GestorTareas - A modern task management system built with Next.js and React",
   "private": true,
   "version": "0.0.1",
   "type": "module",
